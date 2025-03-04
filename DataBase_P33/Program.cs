@@ -19,15 +19,32 @@ class Program
         }
     }
 
-    public static void AddDoctor(MySqlConnection connection, string name, decimal premium, decimal salary)
+    public static void AddDoctor(MySqlConnection connection, string name, 
+        decimal premium, decimal salary)
     {
-        string query = "INSERT INTO Doctors (Name, Premium, Salary) VALUES (@name, @premium, @salary);";
+        string query = "INSERT INTO Doctors (Name, Premium, Salary) " +
+            "VALUES (@name, @premium, @salary);";
         using(MySqlCommand cmd = new MySqlCommand(query, connection)) 
         {
             cmd.Parameters.AddWithValue("@name", name);
             cmd.Parameters.AddWithValue("@premium", premium);
             cmd.Parameters.AddWithValue("@salary", salary);
             cmd.ExecuteNonQuery();
+        }
+    }
+
+    public static void GetDoctors(MySqlConnection connection)
+    {
+        string query = "SELECT * FROM Doctors;";
+        using(MySqlCommand cmd = new MySqlCommand(query, connection))
+        using(MySqlDataReader reader = cmd.ExecuteReader()) 
+        {
+            while(reader.Read())
+            {
+                Console.WriteLine($"{reader["ID"], 3}, {reader["Name"], 20}, " +
+                    $"{reader["Premium"], 8} грн., {reader["Salary"], 9} грн.");
+            }
+            
         }
     }
 
@@ -41,7 +58,8 @@ class Program
         string db_user = "root";
         string db_password = "";
 
-        string connectionString = $"Server={db_host};Database={db_database};User ID={db_user};Password={db_password};";
+        string connectionString = $"Server={db_host};Database={db_database};" +
+            $"User ID={db_user};Password={db_password};";
 
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
@@ -50,7 +68,8 @@ class Program
                 connection.Open();
                 Console.WriteLine($"Successfully connected to data base {db_database}");
                 CreateTables(connection);
-                AddDoctor(connection, "Іванов Іван", 200, 1000);
+                // AddDoctor(connection, "Іванов Іван", 200, 1000);
+                GetDoctors(connection);
             }
             catch (Exception ex)
             {
